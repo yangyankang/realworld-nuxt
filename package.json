@@ -1,0 +1,21 @@
+{
+  "name": "realworld-nuxtjs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
+    "pm2": "nuxt build && pm2 start npm --name realworld-nuxtjs -- run start"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cookieparser": "^0.1.0",
+    "dayjs": "^1.10.4",
+    "js-cookie": "^2.2.1",
+    "markdown-it": "^12.0.4",
+    "nuxt": "^2.14.12"
+  }
+}

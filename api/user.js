@@ -26,3 +26,12 @@ export const fetchCurrentUser = () => {
     url: '/api/user',
   })
 }
+
+// 更新用户资料
+export const updateUser = (data) => {
+  return request({
+    method: 'put',
+    url: '/api/user',
+    data
+  })
+}

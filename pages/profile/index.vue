@@ -1,26 +1,33 @@
 <template>
+
   <div class="profile-page">
 
     <div class="user-info">
       <div class="container">
         <div class="row">
-
           <div class="col-xs-12 col-md-10 offset-md-1">
+
             <img
-              src="http://i.imgur.com/Qr71crq.jpg"
               class="user-img"
-            />
-            <h4>Eric Simons</h4>
-            <p>
-              Cofounder @GoThinkster, lived in Aol's HQ for a few months, kinda looks like Peeta from the Hunger Games
-            </p>
-            <button class="btn btn-sm btn-outline-secondary action-btn">
+              :src="profile.image"
+            >
+            <h4>{{profile.username}}</h4>
+            <p>{{profile.bio}}</p>
+            <button class="btn btn-sm action-btn  btn-outline-secondary">
               <i class="ion-plus-round"></i>
               &nbsp;
-              Follow Eric Simons
+              Follow {{user.username}}
             </button>
-          </div>
 
+            <nuxt-link
+              class="btn btn-sm btn-outline-secondary action-btn"
+              to="/settings"
+              v-if="profile.username === user.username"
+            >
+              <i class="ion-gear-a"></i> Edit Profile Settings
+            </nuxt-link>
+
+          </div>
         </div>
       </div>
     </div>
@@ -32,71 +39,39 @@
           <div class="articles-toggle">
             <ul class="nav nav-pills outline-active">
               <li class="nav-item">
-                <a
-                  class="nav-link active"
-                  href=""
-                >My Articles</a>
+                <nuxt-link
+                  class="nav-link"
+                  :class="{
+                    active: tab === 'my'
+                  }"
+                  exact
+                  :to="{
+                    path: `/profile/${username}`,
+                    query: {
+                      tab: 'my'
+                    }
+                  }"
+                >My Articles</nuxt-link>
               </li>
               <li class="nav-item">
-                <a
+                <nuxt-link
                   class="nav-link"
-                  href=""
-                >Favorited Articles</a>
+                  :class="{
+                    active: tab === 'favorited'
+                  }"
+                  exact
+                  :to="{
+                   path: `/profile/${username}`,
+                    query: {
+                      tab: 'favorited'
+                    }
+                  }"
+                >Favorited Articles</nuxt-link>
               </li>
             </ul>
           </div>
 
-          <div class="article-preview">
-            <div class="article-meta">
-              <a href=""><img src="http://i.imgur.com/Qr71crq.jpg" /></a>
-              <div class="info">
-                <a
-                  href=""
-                  class="author"
-                >Eric Simons</a>
-                <span class="date">January 20th</span>
-              </div>
-              <button class="btn btn-outline-primary btn-sm pull-xs-right">
-                <i class="ion-heart"></i> 29
-              </button>
-            </div>
-            <a
-              href=""
-              class="preview-link"
-            >
-              <h1>How to build webapps that scale</h1>
-              <p>This is the description for the post.</p>
-              <span>Read more...</span>
-            </a>
-          </div>
-
-          <div class="article-preview">
-            <div class="article-meta">
-              <a href=""><img src="http://i.imgur.com/N4VcUeJ.jpg" /></a>
-              <div class="info">
-                <a
-                  href=""
-                  class="author"
-                >Albert Pai</a>
-                <span class="date">January 20th</span>
-              </div>
-              <button class="btn btn-outline-primary btn-sm pull-xs-right">
-                <i class="ion-heart"></i> 32
-              </button>
-            </div>
-            <a
-              href=""
-              class="preview-link"
-            >
-              <h1>The song you won't ever stop singing. No matter how hard you try.</h1>
-              <p>This is the description for the post.</p>
-              <span>Read more...</span>
-              <ul class="tag-list">
-                <li class="tag-default tag-pill tag-outline">Music</li>
-                <li class="tag-default tag-pill tag-outline">Song</li>
-              </ul>
-            </a>
-          </div>
+          <article-item :articles="articles"></article-item>
 
         </div>
 
@@ -107,9 +82,48 @@
 </template>
 
 <script>
+import { getProfile } from "@/api/profile";
+import { getAllArticles } from "@/api/article";
+import ArticleItem from "../article/components/article-item";
 export default {
   middleware: "authenticated",
   name: "ProfileIndex",
+  components: {
+    ArticleItem,
+  },
+  data() {
+    return {};
+  },
+  async asyncData({ params, store, query }) {
+    const { username } = params;
+    const { tab = "my" } = query;
+    const paramsData =
+      tab === "my"
+        ? {
+            author: username,
+            limit: 5,
+            offset: 0,
+          }
+        : {
+            favorited: username,
+            limit: 5,
+            offset: 0,
+          };
+    let [profileData, myArticleData] = await Promise.all([
+      getProfile(username),
+      getAllArticles(paramsData),
+    ]);
+    return {
+      profile: profileData.data.profile,
+      user: store.state.user,
+      articles: myArticleData.data.articles,
+      username,
+      tab,
+    };
+  },
+  watchQuery: ["tab"],
+  mounted() {},
+  methods: {},
 };
 </script>
 

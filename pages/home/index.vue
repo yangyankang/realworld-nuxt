@@ -4,7 +4,7 @@
     <div class="banner">
       <div class="container">
         <h1 class="logo-font">conduit</h1>
-        <p>One Day  Tommy-Yang.</p>
+        <p>One Day Tommy-Yang.</p>
       </div>
     </div>
 
@@ -67,54 +67,7 @@
               </li>
             </ul>
           </div>
-
-          <div
-            class="article-preview"
-            v-for="article in articles"
-            :key="article.slug"
-          >
-            <div class="article-meta">
-              <nuxt-link :to="{
-              name: 'profile',
-              params: {
-                username: article.author.username
-              }
-            }"><img :src="article.author.image" /></nuxt-link>
-              <div class="info">
-                <nuxt-link
-                  :to="{
-              name: 'profile',
-              params: {
-                username: article.author.username
-              }
-            }"
-                  class="author"
-                >{{article.author.username}}</nuxt-link>
-                <span class="date">{{ article.createdAt | date}}</span>
-              </div>
-              <button
-                class="btn btn-outline-primary btn-sm pull-xs-right"
-                :class="{active: article.favorited}"
-                :disabled="article.favoriteDisabled"
-                @click="onFavorite(article)"
-              >
-                <i class="ion-heart"></i> {{article.favoritesCount}}
-              </button>
-            </div>
-            <nuxt-link
-              :to="{
-                name: 'article',
-                params: {
-                  slug: article.slug
-                }
-              }"
-              class="preview-link"
-            >
-              <h1>{{ article.title }}</h1>
-              <p>{{ article.body }}</p>
-              <span>Read more...</span>
-            </nuxt-link>
-          </div>
+          <article-item :articles="articles"></article-item>
           <!-- 分页列表 -->
           <nav>
             <ul class="pagination">
@@ -177,13 +130,15 @@
 import {
   getAllArticles,
   getUserArticles,
-  favoriteArticle,
-  unfavoriteArticle,
 } from "@/api/article";
 import { getAllTags } from "@/api/tag";
 import { mapState } from "vuex";
+import ArticleItem from "../article/components/article-item";
 export default {
   name: "HomeIndex",
+  components: {
+    ArticleItem,
+  },
   data() {
     return {};
   },
@@ -205,9 +160,9 @@ export default {
       getAllTags(),
     ]);
     const { articles, articlesCount } = articleRes.data;
-    articles.forEach(article => {
-      article.favoriteDisabled = false
-    })
+    articles.forEach((article) => {
+      article.favoriteDisabled = false;
+    });
     const { tags } = tagRes.data;
     return {
       articles,
@@ -226,22 +181,7 @@ export default {
       return Math.ceil(this.articlesCount / this.limit);
     },
   },
-  methods: {
-    async onFavorite(article) {
-      article.favoriteDisabled = true
-      let { slug } = article;
-      if (article.favorited) {
-        await unfavoriteArticle(slug);
-        article.favorited = false
-        article.favoritesCount--
-      }else {
-        await favoriteArticle(slug)
-        article.favorited = true
-        article.favoritesCount++
-      }
-       article.favoriteDisabled = false
-    },
-  },
+
 };
 </script>
 

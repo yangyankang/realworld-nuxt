@@ -53,11 +53,19 @@ export const createArticle = (data) => {
 } 
 
 // 修改文章
-export const updateArticle = (data) => {
+export const updateArticle = (slug, data) => {
   return request({
     url: `/api/articles/${slug}`,
     method: 'POST',
     data
+  })
+} 
+
+// 删除文章
+export const deleteArticle = (slug) => {
+  return request({
+    url: `/api/articles/${slug}`,
+    method: 'DELETE',
   })
 } 
 
@@ -66,5 +74,14 @@ export const getArticleComments = (slug) => {
   return request({
     url: `/api/articles/${slug}/comments`,
     method: 'GET',
+  })
+} 
+
+// 添加评论到文章中
+export const addArticleComments = (slug, data) => {
+  return request({
+    url: `/api/articles/${slug}/comments`,
+    method: 'POST',
+    data
   })
 } 

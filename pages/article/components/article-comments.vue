@@ -3,6 +3,7 @@
     <form class="card comment-form">
       <div class="card-block">
         <textarea
+          v-model="commentTxt"
           class="form-control"
           placeholder="Write a comment..."
           rows="3"
@@ -13,13 +14,21 @@
           :src="user.image"
           class="comment-author-img"
         />
-        <button class="btn btn-sm btn-primary">
+        <button
+          class="btn btn-sm btn-primary"
+          @click="postComment"
+          :disabled="postBtnDisable"
+        >
           Post Comment
         </button>
       </div>
     </form>
 
-    <div class="card" v-for="comment in comments" :key="comment.id">
+    <div
+      class="card"
+      v-for="comment in comments"
+      :key="comment.id"
+    >
       <div class="card-block">
         <p class="card-text">{{ comment.body }}</p>
       </div>
@@ -54,28 +63,52 @@
 </template>
 
 <script>
-import { getArticleComments } from '@/api/article'
-import { mapState } from 'vuex'
+import { getArticleComments, addArticleComments } from "@/api/article";
+import { mapState } from "vuex";
 export default {
-  name: 'ArticleComments',
+  name: "ArticleComments",
   props: {
     article: {
       type: Object,
       required: true,
-    }
+    },
   },
   computed: {
-    ...mapState(['user'])
+    ...mapState(["user"]),
   },
   data() {
     return {
-      comments: []
+      comments: [],
+      commentTxt: "",
+      postBtnDisable: false,
     };
   },
   components: {},
- async mounted() {
-   const { data } = await getArticleComments(this.article.slug)
-   this.comments = data.comments
+  async mounted() {
+    this.getComments();
+  },
+  methods: {
+    async getComments() {
+      const { data } = await getArticleComments(this.article.slug);
+      this.comments = data.comments;
+    },
+    async postComment() {
+      if (!this.commentTxt) {
+        alert("请输入");
+        return;
+      }
+      this.postBtnDisable = true;
+      let { slug } = this.$route.params;
+
+      await addArticleComments(slug, {
+        comment: {
+          body: this.commentTxt,
+        },
+      });
+      this.getComments();
+      this.postBtnDisable = false;
+      this.commentTxt = ''
+    },
   },
 };
 </script>

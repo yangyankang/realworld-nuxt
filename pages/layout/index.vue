@@ -45,6 +45,12 @@
                 {{ user.username }}
               </nuxt-link>
             </li>
+            <li class="nav-item">
+              <button
+                @click="logout"
+                class="logout-btn"
+              >退出登录</button>
+            </li>
           </template>
           <template v-else>
             <li class="nav-item">
@@ -82,6 +88,7 @@
 
 <script>
 import { mapState } from "vuex";
+const Cookie = process.client ? require("js-cookie") : undefined;
 export default {
   data() {
     return {};
@@ -89,8 +96,23 @@ export default {
   computed: {
     ...mapState(["user"]),
   },
+  methods: {
+    logout() {
+      this.$store.commit("setUser", null);
+      Cookie.remove("user");
+      this.$router.push("/");
+    },
+  },
 };
 </script>
 
 <style lang='scss' scoped>
+.logout-btn {
+  border: none;
+  border: none;
+  margin-top: 6px;
+  border-radius: 5px;
+  font-size: 16px;
+  color: lightcoral;
+}
 </style>
